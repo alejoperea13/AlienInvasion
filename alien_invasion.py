@@ -13,14 +13,16 @@ class AlienInvasion:
         """Initialize the game, and create game resources."""
         pygame.init()
         self.settings = Settings()
-        self.screen = pygame.display.set_mode(
-            (self.settings.screen_width, self.settings.screen_height))
+        self.WINDOW_SIZE = (self.settings.screen_width,
+                            self.settings.screen_height)
+        self.screen = pygame.display.set_mode(self.WINDOW_SIZE, 0, 32)
         # FULLSCREEN
         # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         # self.settings.screen_width = self.screen.get_rect().width
         # self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion")
         self.clock = pygame.time.Clock()
+        self.display = pygame.Surface((300, 200))
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -71,9 +73,13 @@ class AlienInvasion:
 
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
-        self.screen.fill(self.settings.bg_color)
-        self.screen.blit(self.settings.bg_image, (0, 0))
+        self.surf = pygame.transform.scale(self.display,
+                                           self.WINDOW_SIZE)
+        self.screen.blit(self.surf, (0, 0))
+        self.display.fill(self.settings.bg_color)
+        self.display.blit(self.settings.bg_image, (0, 0))
         self.ship.blitme()
+
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)

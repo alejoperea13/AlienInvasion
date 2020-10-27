@@ -9,7 +9,7 @@ class Bullet(Sprite):
         """Crate a bullet object at the ship's current position."""
         super().__init__()
         self.settings = ai_game.settings
-        self.screen = ai_game.screen
+        self.screen = ai_game.display
         self.color = self.settings.bullet_color
 
         # Create a bullet rect at (0, 0) and then set the
