@@ -22,7 +22,10 @@ class AlienInvasion:
         # self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion")
         self.clock = pygame.time.Clock()
-        self.display = pygame.Surface((300, 200))
+        self.display_width = 320 #300
+        self.display_height = 220 #200
+        self.display = pygame.Surface((self.display_width,
+                                       self.display_height))
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -41,7 +44,7 @@ class AlienInvasion:
             self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
-            print(f"Clock: {self.clock}")
+            #print(f"Clock: {self.clock}")
 
     def _check_events(self):
         """Respond to keypress and mouse events."""
@@ -79,11 +82,12 @@ class AlienInvasion:
         self.screen.blit(self.surf, (0, 0))
         self.display.fill(self.settings.bg_color)
         self.display.blit(self.settings.bg_image, (0, 0))
+        print(f"ship height: {self.ship.rect.height}")
         self.ship.blitme()
 
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
-        self.aliens.draw(self.screen)
+        self.aliens.draw(self.display)
         # Make the most recently drawn screen visible.
         pygame.display.flip()
 
@@ -98,6 +102,17 @@ class AlienInvasion:
         # Update bullet positions.
         self.bullets.update()
 
+        # Check for any bullets that have hit aliens.
+        # If so, get rid of the bullet and the alien.
+        # The 2 Trues tell Python to delete them.
+        collisions = pygame.sprite.groupcollide(self.bullets,
+                                                self.aliens, True, True)
+        if not self.aliens:
+            # Destroy existing bullets and create new fleet.
+            self.bullets.empty()
+            self.settings.alien_speed += 0.5
+            self._create_fleet()
+
         # Get rid of the bullets that have disappeared.
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
@@ -110,14 +125,16 @@ class AlienInvasion:
         # Spacing between each alien is equal to one alien width.
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
-        available_space_x = self.settings.screen_width - (2 * alien_width)
-        number_aliens_x = available_space_x // (2 * alien_width)
-
+        available_space_x = self.display_width - (2 * alien_width) #224 width:38
+        number_aliens_x = available_space_x // (2 * alien_width) #2.94
+        print(f"number_aliens_x: {number_aliens_x}", available_space_x / (2 * alien_width))
         # Determine the number of rows of aliens that fit on the screen.
         ship_height = self.ship.rect.height
-        available_space_y = (self.settings.screen_height -
-                             (3 * alien_height) - ship_height)
+        available_space_y = (self.display_height -
+                             (2 * alien_height) - ship_height)
         number_rows = available_space_y // (2 * alien_height)
+        print(f"available space x: {available_space_x}")
+        print(f'alien_width: {alien_width}')
         # Create the full fleet of aliens.
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):

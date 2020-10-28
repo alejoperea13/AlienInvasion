@@ -7,8 +7,8 @@ class Settings:
     def __init__(self):
         """Initialize the game's settings."""
         # Screen settings.
-        self.screen_width = 720
-        self.screen_height = 500
+        self.screen_width = 640 #720
+        self.screen_height = 440 #500
         self.bg_color = (230, 230, 230)
         self.bg_image = pygame.image.load('images/bg.png')
 
